@@ -1,12 +1,13 @@
 export default class Difference {
     constructor(oldOficcer, newOfficer, items) {
-        this.oldOficcer = document.querySelector(oldOficcer);
-        this.newOfficer = document.querySelector(newOfficer);
-        this.oldItems = this.oldOficcer.querySelectorAll(items);
-        this.newItems = this.newOfficer.querySelectorAll(items);
-
-        this.oldCounter = 0;
-        this.newCounter = 0;
+        try {
+            this.oldOficcer = document.querySelector(oldOficcer);
+            this.newOfficer = document.querySelector(newOfficer);
+            this.oldItems = this.oldOficcer.querySelectorAll(items);
+            this.newItems = this.newOfficer.querySelectorAll(items);
+            this.oldCounter = 0;
+            this.newCounter = 0;
+        } catch (e) {}
     }
 
     hideitems(items) {
@@ -33,9 +34,11 @@ export default class Difference {
     
 
     init() {
-        this.hideitems(this.newItems);
-        this.hideitems(this.oldItems);
-        this.bingTriggers(this.oldOficcer, this.oldItems, this.oldCounter);
-        this.bingTriggers(this.newOfficer, this.newItems, this.newCounter);
+        try {
+            this.hideitems(this.newItems);
+            this.hideitems(this.oldItems);
+            this.bingTriggers(this.oldOficcer, this.oldItems, this.oldCounter);
+            this.bingTriggers(this.newOfficer, this.newItems, this.newCounter);
+        } catch (e) {}
     }
 }
