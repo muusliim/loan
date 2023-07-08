@@ -10,9 +10,16 @@ export default class videoPlayer {
             btn.addEventListener('click', () => {
                 if (document.querySelector('iframe#frame')) {
                     this.overlay.style.display = 'flex';
+                    if (this.path !== btn.getAttribute('data-url')) {
+                        this.path = btn.getAttribute('data-url'); 
+                        this.player.loadVideoById({
+                            videoId: this.path
+                        });
+
+                    }
                 } else {
-                    const path = btn.getAttribute('data-url');  
-                    this.createPlayer(path)
+                    this.path = btn.getAttribute('data-url');  
+                    this.createPlayer(this.path)
                 }
             });
         });
@@ -21,7 +28,7 @@ export default class videoPlayer {
     bindCloseBtn() {
         this.close.addEventListener('click', () => {
             this.overlay.style.display = 'none';
-            this.player.stopVideo(); 
+            this.player.stopVideo();
         });
     }
 
@@ -31,19 +38,23 @@ export default class videoPlayer {
              width: '100%',
              videoId: `${url}`
           });
-        console.log(this.player);
         this.overlay.style.display = 'flex';
     } 
 
     init() {
-        const tag = document.createElement('script');
+        if (this.btns.length > 0) {
+            const tag = document.createElement('script');
 
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        this.bindTriggers(); 
-        this.bindCloseBtn();
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+            this.bindTriggers(); 
+            this.bindCloseBtn();
+        }
     }
 
+
+    
 }
+

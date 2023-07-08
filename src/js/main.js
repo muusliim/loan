@@ -3,6 +3,8 @@ import MainSlider from './modules/slider/slider-main';
 import MiniSlider from './modules/slider/slider-mini';
 import videoPlayer from './modules/videoPlayer';
 import Forms from './modules/forms';
+import ShowInfo from './modules/showInfo';
+import Download from './modules/download';
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -43,10 +45,14 @@ window.addEventListener('DOMContentLoaded', () => {
     feedSlider.init();
     
     
-    const player = new videoPlayer('.showup .play', '.overlay');
-    player.init();
+    new videoPlayer('.showup .play', '.overlay').init();
+    new videoPlayer('.module__video-item', '.overlay').init();
 
     new Difference('.officerold', '.officernew', '.officer__card-item').init();
     
     new Forms('.form').init();
+
+    new ShowInfo('.plus__content').init();
+
+    new Download('.download').init();
 });

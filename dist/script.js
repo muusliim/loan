@@ -14,12 +14,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 class Difference {
   constructor(oldOficcer, newOfficer, items) {
-    this.oldOficcer = document.querySelector(oldOficcer);
-    this.newOfficer = document.querySelector(newOfficer);
-    this.oldItems = this.oldOficcer.querySelectorAll(items);
-    this.newItems = this.newOfficer.querySelectorAll(items);
-    this.oldCounter = 0;
-    this.newCounter = 0;
+    try {
+      this.oldOficcer = document.querySelector(oldOficcer);
+      this.newOfficer = document.querySelector(newOfficer);
+      this.oldItems = this.oldOficcer.querySelectorAll(items);
+      this.newItems = this.newOfficer.querySelectorAll(items);
+      this.oldCounter = 0;
+      this.newCounter = 0;
+    } catch (e) {}
   }
   hideitems(items) {
     items.forEach((item, i, arr) => {
@@ -41,10 +43,197 @@ class Difference {
     });
   }
   init() {
-    this.hideitems(this.newItems);
-    this.hideitems(this.oldItems);
-    this.bingTriggers(this.oldOficcer, this.oldItems, this.oldCounter);
-    this.bingTriggers(this.newOfficer, this.newItems, this.newCounter);
+    try {
+      this.hideitems(this.newItems);
+      this.hideitems(this.oldItems);
+      this.bingTriggers(this.oldOficcer, this.oldItems, this.oldCounter);
+      this.bingTriggers(this.newOfficer, this.newItems, this.newCounter);
+    } catch (e) {}
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/download.js":
+/*!************************************!*\
+  !*** ./src/js/modules/download.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Download)
+/* harmony export */ });
+class Download {
+  constructor(triggers) {
+    this.btns = document.querySelectorAll(triggers);
+    this.path = 'assets/img/mainbg.jpg';
+  }
+  downloadItem(path) {
+    const link = document.createElement('a');
+    link.setAttribute('href', path);
+    link.setAttribute('download', 'picture');
+    link.style.display = 'none';
+    document.body.append(link);
+    link.click();
+    document.body.remove(link);
+  }
+  init() {
+    this.btns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        this.downloadItem(this.path);
+      });
+    });
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/forms.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/forms.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Forms)
+/* harmony export */ });
+class Forms {
+  constructor(forms) {
+    this.forms = document.querySelectorAll(forms);
+    this.inputs = document.querySelectorAll('input');
+    this.message = {
+      loading: 'Loading...',
+      success: `Thank you! we'll be in touch soon`,
+      failure: 'Oops! something went wrong...'
+    };
+    this.path = 'assets/question.php';
+  }
+  clearInputs() {
+    this.inputs.forEach(input => {
+      input.value = '';
+    });
+  }
+  checkMailInputs() {
+    const mailInputs = document.querySelectorAll('[type="email"]');
+    mailInputs.forEach(input => {
+      input.addEventListener('keypress', e => {
+        if (e.key.match(/[^a-z 0-9 @ \. -\_ +]/ig)) {
+          e.preventDefault();
+        }
+      });
+      input.addEventListener('input', () => {
+        input.style.cssText = 'border: none';
+        if (input.value.match(/[^a-z 0-9 @ \. \- + \_]/ig)) {
+          input.style.cssText = 'border: 1px solid red';
+        }
+      });
+    });
+  }
+  async postData(url, data) {
+    const res = await fetch(url, {
+      method: 'POST',
+      body: data
+    });
+    return await res.text();
+  }
+  //phone mask
+  initMask() {
+    let setCursorPosition = (pos, elem) => {
+      elem.focus();
+      if (elem.setSelectionRange) {
+        elem.setSelectionRange(pos, pos);
+      } else if (elem.createTextRange) {
+        let range = elem.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', pos);
+        range.moveStart('character', pos);
+        range.select();
+      }
+    };
+    function createMask(event) {
+      let matrix = '+1 (___) ___-____',
+        i = 0,
+        def = matrix.replace(/\D/g, ''),
+        val = this.value.replace(/\D/g, '');
+      if (def.length >= val.length) {
+        val = def;
+      }
+      this.value = matrix.replace(/./g, function (a) {
+        return /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? '' : a;
+      });
+      if (event.type === 'blur') {
+        if (this.value.length == 2) {
+          this.value = '';
+        }
+      } else {
+        setCursorPosition(this.value.length, this);
+      }
+    }
+    let inputs = document.querySelectorAll('[name="phone"]');
+    inputs.forEach(input => {
+      input.addEventListener('input', createMask);
+      input.addEventListener('focus', createMask);
+      input.addEventListener('blur', createMask);
+    });
+  }
+
+  //main init method
+  init() {
+    this.initMask();
+    this.checkMailInputs();
+    this.forms.forEach(item => {
+      item.addEventListener('submit', e => {
+        e.preventDefault();
+        const statusMessage = document.createElement('div');
+        statusMessage.style.cssText = `
+                    margin-top: 20px;
+                    color: grey;
+                    font-size: 18px;
+                `;
+        item.parentElement.append(statusMessage);
+        statusMessage.textContent = this.message.loading;
+        const formData = new FormData(item);
+        this.postData(this.path, formData).then(item => {
+          console.log(item);
+          statusMessage.textContent = this.message.success;
+        }).catch(() => statusMessage.textContent = this.message.failure).finally(() => {
+          this.clearInputs();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 3000);
+        });
+      });
+    });
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/showInfo.js":
+/*!************************************!*\
+  !*** ./src/js/modules/showInfo.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ ShowInfo)
+/* harmony export */ });
+class ShowInfo {
+  constructor(triggers) {
+    this.btns = document.querySelectorAll(triggers);
+  }
+  init() {
+    this.btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sibling = btn.closest('.module__info-show').nextElementSibling;
+        sibling.classList.toggle('msg');
+        sibling.style.marginTop = '20px';
+      });
+    });
   }
 }
 
@@ -93,19 +282,38 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   plusSlides(n) {
     this.showSlides(this.slideIndex += n);
   }
-  render() {
-    this.btns.forEach(btn => {
-      btn.addEventListener('click', () => this.plusSlides(1));
-      try {
-        this.hanson = document.querySelector('.hanson');
-      } catch (e) {}
-      btn.parentElement.previousElementSibling.addEventListener('click', e => {
+  bindTriggers() {
+    this.modulePrevBtn.forEach(item => {
+      item.addEventListener('click', e => {
+        e.stopPropagation();
         e.preventDefault();
-        this.slideIndex = 1;
-        this.showSlides(this.slideIndex);
+        this.plusSlides(-1);
       });
     });
-    this.showSlides(this.slideIndex);
+    this.moduleNextBtn.forEach(item => {
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.plusSlides(1);
+      });
+    });
+  }
+  render() {
+    if (this.container) {
+      this.btns.forEach(btn => {
+        btn.addEventListener('click', () => this.plusSlides(1));
+        try {
+          this.hanson = document.querySelector('.hanson');
+        } catch (e) {}
+        btn.parentElement.previousElementSibling.addEventListener('click', e => {
+          e.preventDefault();
+          this.slideIndex = 1;
+          this.showSlides(this.slideIndex);
+        });
+      });
+      this.showSlides(this.slideIndex);
+      this.bindTriggers();
+    }
   }
 }
 
@@ -165,17 +373,19 @@ class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
     });
   }
   init() {
-    this.container.style.cssText = `
-        display: flex; 
-        flex-wrap: wrap;
-        overflow: hidden;
-        align-items: flex-start;
-        `;
-    this.bindTrigger();
-    this.decorizeSlides();
-    if (this.autoplay) {
-      setInterval(() => this.nextSlide(), 5000);
-    }
+    try {
+      this.container.style.cssText = `
+            display: flex; 
+            flex-wrap: wrap;
+            overflow: hidden;
+            align-items: flex-start;
+            `;
+      this.bindTrigger();
+      this.decorizeSlides();
+      if (this.autoplay) {
+        setInterval(() => this.nextSlide(), 5000);
+      }
+    } catch (e) {}
   }
 }
 
@@ -198,15 +408,21 @@ class Slider {
       btns = null,
       next = null,
       prev = null,
+      moduleNxtBtn = null,
+      modulePrevBtn = null,
       activeClass = '',
       animate = false,
       autoplay = false
     } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     this.container = document.querySelector(container);
-    this.slides = this.container.children;
+    try {
+      this.slides = this.container.children;
+    } catch (e) {}
     this.btns = document.querySelectorAll(btns);
-    this.prev = document.querySelector(prev);
-    this.next = document.querySelector(next);
+    this.prev = document.querySelectorAll(prev);
+    this.next = document.querySelectorAll(next);
+    this.moduleNextBtn = document.querySelectorAll(moduleNxtBtn);
+    this.modulePrevBtn = document.querySelectorAll(modulePrevBtn);
     this.activeClass = activeClass;
     this.animate = animate;
     this.autoplay = autoplay;
@@ -237,9 +453,15 @@ class videoPlayer {
       btn.addEventListener('click', () => {
         if (document.querySelector('iframe#frame')) {
           this.overlay.style.display = 'flex';
+          if (this.path !== btn.getAttribute('data-url')) {
+            this.path = btn.getAttribute('data-url');
+            this.player.loadVideoById({
+              videoId: this.path
+            });
+          }
         } else {
-          const path = btn.getAttribute('data-url');
-          this.createPlayer(path);
+          this.path = btn.getAttribute('data-url');
+          this.createPlayer(this.path);
         }
       });
     });
@@ -256,16 +478,17 @@ class videoPlayer {
       width: '100%',
       videoId: `${url}`
     });
-    console.log(this.player);
     this.overlay.style.display = 'flex';
   }
   init() {
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    this.bindTriggers();
-    this.bindCloseBtn();
+    if (this.btns.length > 0) {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      this.bindTriggers();
+      this.bindCloseBtn();
+    }
   }
 }
 
@@ -338,6 +561,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/slider/slider-main */ "./src/js/modules/slider/slider-main.js");
 /* harmony import */ var _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/slider/slider-mini */ "./src/js/modules/slider/slider-mini.js");
 /* harmony import */ var _modules_videoPlayer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/videoPlayer */ "./src/js/modules/videoPlayer.js");
+/* harmony import */ var _modules_forms__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/forms */ "./src/js/modules/forms.js");
+/* harmony import */ var _modules_showInfo__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/showInfo */ "./src/js/modules/showInfo.js");
+/* harmony import */ var _modules_download__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./modules/download */ "./src/js/modules/download.js");
+
+
+
 
 
 
@@ -350,6 +579,13 @@ window.addEventListener('DOMContentLoaded', () => {
     btns: '.next'
   });
   slider.render();
+  const modulePageSlider = new _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    container: '.moduleapp',
+    btns: '.next',
+    modulePrevBtn: '.prevmodule',
+    moduleNextBtn: '.nextmodule'
+  });
+  modulePageSlider.render();
   const showUpSlider = new _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_2__["default"]({
     container: '.showup__content-slider',
     next: '.showup__next',
@@ -375,9 +611,12 @@ window.addEventListener('DOMContentLoaded', () => {
     animate: false
   });
   feedSlider.init();
-  const player = new _modules_videoPlayer__WEBPACK_IMPORTED_MODULE_3__["default"]('.showup .play', '.overlay');
-  player.init();
+  new _modules_videoPlayer__WEBPACK_IMPORTED_MODULE_3__["default"]('.showup .play', '.overlay').init();
+  new _modules_videoPlayer__WEBPACK_IMPORTED_MODULE_3__["default"]('.module__video-item', '.overlay').init();
   new _modules_difference__WEBPACK_IMPORTED_MODULE_0__["default"]('.officerold', '.officernew', '.officer__card-item').init();
+  new _modules_forms__WEBPACK_IMPORTED_MODULE_4__["default"]('.form').init();
+  new _modules_showInfo__WEBPACK_IMPORTED_MODULE_5__["default"]('.plus__content').init();
+  new _modules_download__WEBPACK_IMPORTED_MODULE_6__["default"]('.download').init();
 });
 })();
 

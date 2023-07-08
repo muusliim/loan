@@ -40,7 +40,6 @@ export default class MainSlider extends Slider {
 
     bindTriggers() {
 
-
         this.modulePrevBtn.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
